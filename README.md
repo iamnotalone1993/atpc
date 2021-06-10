@@ -1,2 +1,1 @@
-# atpc
-Advanced Topics in Parallel Computing
+# Advanced Topics in Parallel Computing
