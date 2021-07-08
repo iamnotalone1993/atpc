@@ -1,6 +1,11 @@
-#include <iostream>
-#include <thread>
-#include <atomic>
+#include <iostream>	// std::cout...
+#include <thread>	// std::thread...
+#include <atomic>	// std::atomic...
+#include <cassert>	// assert...
+
+/* Shared constants */
+const int       NUM_OF_THREADS  = std::thread::hardware_concurrency();
+const int       NUM_OF_PAIRS    = 10; // push & pop pairs
 
 template <typename T> struct CountedPtr;
 
@@ -27,6 +32,7 @@ public:
 	void push(Node<T> *n);
 	Node<T> *pop();
 	void print();
+	void test();
 
 private:
 	std::atomic<CountedPtr<T>>	top;
@@ -34,10 +40,7 @@ private:
 
 /* Stack's Implementation */
 template <typename T>
-Stack<T>::Stack()
-{
-	top = {nullptr, 0};
-}
+Stack<T>::Stack() : top {{nullptr, 0}} {}
 
 template <typename T>
 void Stack<T>::push(Node<T> *n)
@@ -61,7 +64,7 @@ Node<T> *Stack<T>::pop()
 		if (oldtop.ptr == nullptr)
 			return nullptr;
 		newtop = (oldtop.ptr)->next;
-		++(newtop.count);
+		newtop.count = oldtop.count + 1;
 	} while (!top.compare_exchange_weak(oldtop, newtop));
 
 	return oldtop.ptr;
@@ -77,33 +80,38 @@ void Stack<T>::print()
 	std::cout << "top.count = " << top.load().count << std::endl;
 }
 
+template <typename T>
+void Stack<T>::test()
+{
+	assert(top.load().ptr == nullptr);
+        assert(top.load().count == NUM_OF_THREADS * NUM_OF_PAIRS);
+}
+
 /* Shared variables */
-const uint64_t	NUM_OF_THREADS	= std::thread::hardware_concurrency();
 Stack<int>	MyStack;
 
 /* Private variables */
-//thread_local ...
+// thread_local ...
 
 /* Child thread's code */
 inline void thread_entry()
 {
 	Node<int>	*n;
 
-	//Sequential Alternating
-	for (uint64_t i = 0; i < 10; ++i)
+	// Sequential Alternating
+	for (auto i = 0; i < NUM_OF_PAIRS; ++i)
 	{
 		n = new Node<int>;
 		n->val = i;
 		MyStack.push(n);
-		//n = MyStack.pop();
-		//delete n;
+		n = MyStack.pop();
+		delete n;
 	}
 }
 
 /* Main thread's code */
 int main()
 {
-	uint64_t 	i;
 	std::thread 	threads[NUM_OF_THREADS];
 
 	// Check if CounterPtr is lock-free
@@ -112,17 +120,21 @@ int main()
 		std::cout << "CountedPtr is lock-free!" << std::endl;
 	else
 		std::cout << "CountedPtr is not lock-free!" << std::endl;
+	std::cout << "*********************" << std::endl;
 
 	// The main thread forks
-	for (i = 0; i < NUM_OF_THREADS; ++i)
+	for (auto i = 0; i < NUM_OF_THREADS; ++i)
 		threads[i] = std::thread(thread_entry);
 
 	// The child threads join
-	for (i = 0; i < NUM_OF_THREADS; ++i)
+	for (auto i = 0; i < NUM_OF_THREADS; ++i)
 		threads[i].join();
 
 	// Print the stack
 	MyStack.print();
+
+	// Test the stack
+	MyStack.test();
 
 	return 0;
 }

@@ -1,6 +1,7 @@
-#include <iostream>
-#include <thread>
-#include <atomic>
+#include <iostream>	// std::cout...
+#include <thread>	// std::thread...
+#include <atomic>	// std::atomic...
+#include <cassert>	// assert...
 
 template <typename T>
 struct Node 
@@ -10,12 +11,12 @@ struct Node
 };
 
 /* Shared Variables */
-const uint64_t  		NUM_OF_THREADS  = std::thread::hardware_concurrency();
+const int  			NUM_OF_THREADS  = std::thread::hardware_concurrency();
 std::atomic<Node<int> *>	*HP;	// Array of Hazard Pointers
 /**/
 
 /* Private variables */
-thread_local uint64_t		TID;	// Thread's ID
+thread_local int		TID;	// Thread's ID
 /**/
 
 /* Stack's Interface */
@@ -27,16 +28,14 @@ public:
 	bool push(const T &val);
 	bool pop(T &val);
 	void print();
+	void test();
 
 private:
 	std::atomic<Node<T> *>	top;
 };
 
 /* Stack's Implementation */
-template <typename T> Stack<T>::Stack()
-{
-	top = nullptr;
-}
+template <typename T> Stack<T>::Stack() : top{nullptr} {}
 
 template <typename T>
 bool Stack<T>::push(const T &val)
@@ -82,7 +81,7 @@ bool Stack<T>::pop(T &val)
 
 	/* HPs */
 	bool flag = true;
-	for (uint64_t i = 0; i < NUM_OF_THREADS; ++i)
+	for (auto i = 0; i < NUM_OF_THREADS; ++i)
 		if (oldtop == HP[i])
 		{
 			flag = false;
@@ -90,7 +89,7 @@ bool Stack<T>::pop(T &val)
 		}
 	if (flag == true)
 		delete oldtop;
-	else //if (flag == false)
+	else // if (flag == false)
 		{ /* Memory Leaks */ }
 	/**/
 
@@ -106,42 +105,46 @@ void Stack<T>::print()
 	std::cout << "*********************" << std::endl;
 }
 
+template <typename T>
+void Stack<T>::test()
+{
+	assert(top.load() == nullptr);
+}
+
 /* Shared variables */
 Stack<int>	MyStack;
 
 /* Child thread's code */
-inline void thread_entry(uint64_t tid)
+inline void thread_entry(int tid)
 {
-	int	val;
-
+	int val;
 	TID = tid;
 
 	//Sequential Alternating
-	for (uint64_t i = 0; i < 10; ++i)
+	for (auto i = 0; i < 10; ++i)
 	{
 		val = i;
 		MyStack.push(val);
-		//MyStack.pop(val);
+		MyStack.pop(val);
 	}
 }
 
 /* Main thread's code */
 int main()
 {
-	uint64_t 	i;
 	std::thread 	threads[NUM_OF_THREADS];
 
 	// Allocate memory for and initialize the array of Hazard Pointers
         HP = new std::atomic<Node<int> *>[NUM_OF_THREADS];
-	for (i = 0; i < NUM_OF_THREADS; ++i)
+	for (auto i = 0; i < NUM_OF_THREADS; ++i)
 		HP[i] = nullptr;
 
 	// The main thread forks
-	for (i = 0; i < NUM_OF_THREADS; ++i)
+	for (auto i = 0; i < NUM_OF_THREADS; ++i)
 		threads[i] = std::thread(thread_entry, i);
 
 	// The child threads join
-	for (i = 0; i < NUM_OF_THREADS; ++i)
+	for (auto i = 0; i < NUM_OF_THREADS; ++i)
 		threads[i].join();
 
 	// Deallocate memory of the array of Hazard Pointers
@@ -149,6 +152,9 @@ int main()
 
 	// Print the stack
 	MyStack.print();
+
+	// Test the stack
+	MyStack.test();
 
 	return 0;
 }
