@@ -120,7 +120,7 @@ inline void thread_entry(int tid)
 	int val;
 	TID = tid;
 
-	//Sequential Alternating
+	// Sequential Alternating
 	for (auto i = 0; i < 10; ++i)
 	{
 		val = i;
