@@ -148,7 +148,7 @@ int main()
 		threads[i].join();
 
 	// Deallocate memory of the array of Hazard Pointers
-	delete HP;
+	delete[] HP;
 
 	// Print the stack
 	MyStack.print();
