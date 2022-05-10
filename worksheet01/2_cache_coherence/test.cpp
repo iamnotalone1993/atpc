@@ -47,17 +47,14 @@ T DistObj<T>::read()
 	MPI_Status	status;
 	MPI_Request	request;
 	int		buf,
-			flag = 1;
+			flag;
 
-	if (flag)
-        {
-		// check if some other process gives me its token
-		MPI_Irecv(&buf, 1, MPI_INT,
-				(my_pid + num_procs - 1) % num_procs, 0, comm, &request);
-		flag = 0;
-	}
-
+	// check if some other process is requesting my token
+	MPI_Irecv(&buf, 1, MPI_INT,
+			(my_pid + num_procs - 1) % num_procs, 0, comm, &request);
 	MPI_Test(&request, &flag, &status);
+
+	// if yes, then...
 	if (flag)
 	{
 		// give my token to some other process
@@ -70,13 +67,14 @@ T DistObj<T>::read()
 		MPI_Send(&_obj, sizeof(int), MPI_BYTE,
 				(my_pid + num_procs + 1) % num_procs, 1, comm);
 	}
-	else // if (!flag)
+	else // otherwise, then...
 	{
+		// cancel the recv message posted
 		MPI_Cancel(&request);
 		MPI_Wait(&request, &status);
-		flag = 1;
 	}
 
+	// return the current value of the distributed object
 	return _obj;
 }
 
