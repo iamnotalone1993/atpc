@@ -25,7 +25,6 @@ void thread_entry(uint32_t my_tid)
 		while (flag.load(std::memory_order_relaxed) != 1);
 		int tmp = val.load(std::memory_order_relaxed);
 		std::cout << "val = " << tmp << std::endl;
-		assert(val == 42);
 	}
 	else { /* do nothing */ }
 }

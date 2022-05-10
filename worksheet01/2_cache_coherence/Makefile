@@ -2,7 +2,7 @@
 OUT = test
 
 #The performance flags for the compiler
-FLAGS = -pthread -std=gnu++17
+FLAGS = -std=gnu++17 -O3
 
 .PHONY: all run clean
 
@@ -10,11 +10,11 @@ FLAGS = -pthread -std=gnu++17
 all : $(OUT)
 
 $(OUT) : $(OUT).cpp
-	g++ $(OUT).cpp -o $(OUT) $(FLAGS)
+	mpic++ $(OUT).cpp -o $(OUT) $(FLAGS)
 
 #Run your program
 run : $(OUT)
-	for i in `seq 10000`; do ./$(OUT); done
+	mpirun -np 4 ./$(OUT)
 
 #Remove your executable
 clean :
