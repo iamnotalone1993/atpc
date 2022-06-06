@@ -12,7 +12,7 @@ public:
 	WFStackConsensus()
 	{
 		stack.push(WIN);
-		stack.push(LOSE);
+		stack.push(FAIL);
 	}
 
 	// figure out which thread was first

@@ -1,5 +1,5 @@
 #The main file name of your program
-OUT = faa
+OUT = 1b_faa
 
 #The performance flags for the compiler
 FLAGS = -pthread -std=gnu++17 -O3

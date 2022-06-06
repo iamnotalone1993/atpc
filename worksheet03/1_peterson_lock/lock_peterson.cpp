@@ -48,9 +48,9 @@ void thread_entry(int tid)
 
 	for (int i = 0; i < NUM_ITERS; ++i)
 	{
-        	Plock.acquire();	// acquire the mutex lock
+        	//Plock.acquire();	// acquire the mutex lock
         	++counter;		// increment the counter
-       		Plock.release(); 	// release the mutex lock
+       		//Plock.release(); 	// release the mutex lock
 	}
 }
 

@@ -6,7 +6,7 @@
 thread_local int 	self;
 
 /* Shared variables */
-const int		NUM_THREADS = 2;
+const int		NUM_THREADS = 3;
 
 template<typename T>
 class FAAConsensus
@@ -59,7 +59,7 @@ int main()
 	for (i = 0; i < NUM_THREADS; ++i)
 		threads[i].join();
 
-	// check if the censensus is working correctly
+	// check if the consensus protocol is working correctly
 	for (i = 1; i < NUM_THREADS; ++i)
 		assert(array[0] == array[i]);
 
