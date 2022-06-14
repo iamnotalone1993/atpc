@@ -14,9 +14,9 @@ void thread_entry(int tid)
 {
 	for (int i = 0; i < NUM_ITERS; ++i)
 	{
-        	//MCSlock.acquire();	// acquire the mutex lock
+        	MCSlock.acquire();	// acquire the mutex lock
         	++counter;		// increment the counter
-       		//MCSlock.release(); 	// release the mutex lock
+       		MCSlock.release(); 	// release the mutex lock
 	}
 }
 

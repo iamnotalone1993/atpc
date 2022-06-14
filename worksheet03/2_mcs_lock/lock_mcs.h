@@ -45,7 +45,7 @@ void lock_mcs::release()
 {
         if (q.next.load() == nullptr)
         {
-                QNode *p = &q;
+        	QNode *p = &q;
                 if (tail.compare_exchange_strong(p, nullptr))
                         return;
 

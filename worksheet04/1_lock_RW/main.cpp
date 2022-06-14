@@ -46,11 +46,11 @@ int main()
 {
 	std::thread 	threads[NUM_OF_THREADS];	// an array of child threads (a declaration)
 
-	threads[0] = std::thread(thread_entry, 0, WRITER);	// spawn child thread 0
+	threads[0] = std::thread(thread_entry, 0, READER);	// spawn child thread 0
 
 	std::this_thread::sleep_for(std::chrono::seconds(1));	// sleep for 1 sec
 
-	threads[1] = std::thread(thread_entry, 1, READER);	// spawn child thread 1
+	threads[1] = std::thread(thread_entry, 1, WRITER);	// spawn child thread 1
 
 	std::this_thread::sleep_for(std::chrono::seconds(1));   // sleep for 1 sec
 
