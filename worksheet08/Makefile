@@ -1,5 +1,5 @@
 # The main file name of your program
-OUT = main
+OUT = fine_grained
 
 # The compiler
 CC = g++
@@ -12,12 +12,12 @@ FLAGS = -pthread -std=gnu++17 -O3
 # Compile your program
 all : $(OUT)
 
-$(OUT) : $(OUT).cpp config.h lock.h
+$(OUT) : $(OUT).cpp
 	$(CC) $(OUT).cpp -o $(OUT) $(FLAGS)
 
 # Run your program
 run : $(OUT)
-	for i in `seq 10`; do ./$(OUT); done
+	for i in `seq 1`; do ./$(OUT); done
 
 # Remove your executable
 clean :
