@@ -4,7 +4,6 @@
 #include <mutex>	// std::mutex...
 #include <chrono>	// std::chrono...
 #include <random>	// std::uniform_int_distribution...
-#include <cmath>	// exp2l...
 
 using namespace std::chrono;
 
@@ -135,21 +134,18 @@ bool Set<T>::contains(const T& val)
 }
 
 /* Shared variables & constants */
-const int	NUM_THREADS	= 8;			// thread count
-const int 	TOTAL_NUM_OPS	= 3 * exp2l(20);	// total number of ops
+const int	NUM_THREADS	= 8;		// thread count
+const int 	NUM_OPS		= 10000;	// operation count per thread
 Set<int>	s;
 
 /* Child thread's code */
 void thread_entry(int tid)
 {
-	int 	num,
-		code,
-		num_ops = TOTAL_NUM_OPS / NUM_THREADS;
-
+	int num, code;
 	std::default_random_engine generator;
-	std::uniform_int_distribution<int> distribution(0, TOTAL_NUM_OPS);
+	std::uniform_int_distribution<int> distribution(0, NUM_THREADS * NUM_OPS);
 
-	for (int i = 0; i < num_ops; ++i)
+	for (int i = 0; i < NUM_OPS; ++i)
 	{
 		num = distribution(generator);	// generate number in the range 0...NUM_THREADS x NUM_OPS
 		code = num % 3;
@@ -177,7 +173,7 @@ int main(int argc, char* artv[])
 
 	auto stop = high_resolution_clock::now();	// stop timing
 	auto duration = duration_cast<milliseconds>(stop - start);
-	std::cout << double(TOTAL_NUM_OPS) / duration.count() << " operations per millisecond" << std::endl;
+	std::cout << double(NUM_THREADS * NUM_OPS) / duration.count() << " operations per millisecond" << std::endl;
 
 	return 0;
 }
