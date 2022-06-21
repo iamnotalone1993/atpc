@@ -7,7 +7,7 @@ bool atomic_compare_exchange_weak(	std::atomic<T>*	obj,
 					T		val	)
 {
 	T tmp = LL(obj);	// LL: Load Linked
-	if (tmp != *expected)	// a REGULAR failure
+	if (tmp != *expected)	// indicate a REGULAR failure
 	{
 		*expected = tmp;
 		return false;
@@ -20,17 +20,22 @@ bool atomic_compare_exchange_weak(	std::atomic<T>*	obj,
 
 /* compare_exchange_STRONG implementation */
 template<typename T>
-bool atomic_compare_exchange_strong(	std::atomic<T>*	obj,
+bool atomic_compare_exchang_strong(	std::atomic<T>*	obj,
 					T*		expected,
 					T		val	)
 {
-	bool	res;
-	T 	exp_prev = *expected;	// save the original content of parameter @expected
+	T tmp;
+	while (true)
+	{
+		tmp = LL(obj);		// LL: Load Linked
+		if (tmp != *expected)	// indicate a REGULAR failure
+		{
+			*expected = tmp;
+			return false;
+		}
 	
-	do {
-		res = atomic_compare_exchange_weak_explicit(obj, expected, val, success, failure);
-	} while (!res && exp_prev == *expected);	// retry if encountering a spurious failure
-
-	return res;
+		if (SC(obj, val))	// SC: Store Conditional
+			return true;	// indicate a success
+	}
 }
 
