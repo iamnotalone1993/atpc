@@ -11,8 +11,8 @@ public:
 	// initialize stack with two items
 	WFStackConsensus()
 	{
-		stack.push(WIN);
 		stack.push(FAIL);
+		stack.push(WIN);
 	}
 
 	// figure out which thread was first

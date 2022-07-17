@@ -25,9 +25,9 @@ public:
 	T decide(T val)
 	{
 		proposal[self] = val;
-		if (reg.fetch_add(AMOUNT) == 0)
+		if (reg.fetch_add(AMOUNT) == FIRST)
 			return proposal[self];
-		else // if (reg.fetch_add(1) != 0)
+		else // if (reg.fetch_add(1) != FIRST)
 			return proposal[1-self];
 	}
 };

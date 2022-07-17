@@ -1,5 +1,5 @@
 # The input file of your program
-IN = ts_a
+IN = queue_lf
 
 # The main file name of your program
 OUT = out

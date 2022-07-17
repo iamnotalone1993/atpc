@@ -14,7 +14,7 @@ public:
 	// initialize register
 	MMSConsensus()
 		:reg{FIRST},
-		array{new int[NUM_THREADS]},
+		array{new std::atomic<int>[NUM_THREADS]},
 		proposal{new T[NUM_THREADS]} 
 	{
 		for (int tid = 0; tid < NUM_THREADS; ++tid)
